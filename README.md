@@ -31,14 +31,19 @@ Terraform is a tool made by Hashicorp for building, changing, and versioning inf
 # Usage
 
 Initiate the directory where we have the terraform .tf file. Use --backend-config parameter if using external config file.
+
 ```terraform init --backend-config="infrastructure.config"```
 
 Check the changes that Terraform will perform after executing the script.
+
 ```terraform plan (if not using any external file to pass the variables)```
+
 ```terraform plan --var-file="infrastructure-variables.tfvars"```
 
 Apply the modification or creation of the infrastructure as per the code in tf script. This will ask for confirmation (yes) to go ahead.
+
 ```terraform apply```
+
 ```terraform apply --var-file="infrastructure-variables.tfvars"```
 
 > - outputs.tf required to output all the variables after the execution of apply command.
@@ -51,6 +56,7 @@ To delete all the resources/infrastructure created on AWS
 
 # Pricing
 
-Terraform is an open source tool for developing resources. Only cost associated is for building infrastructure in providers like AWS, GCP, Azure.
+Terraform is an open source tool for developing resources. 
+Only cost associated is for building infrastructure in providers like AWS, GCP, Azure.
 Refer to the AWS pricing calculator to know the billing info regarding any resources created in AWS through Terraform.
 https://calculator.s3.amazonaws.com/index.html
