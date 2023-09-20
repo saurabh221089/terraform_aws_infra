@@ -86,6 +86,10 @@ resource "aws_launch_configuration" "ec2_public_launch_configuration" {
   key_name                    = var.keypair
   associate_public_ip_address = true
   security_groups             = [aws_security_group.tf_public_sec_grp.id]
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
   user_data                   = data.template_file.myuserdata.template
 }
 
