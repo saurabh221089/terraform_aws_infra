@@ -18,18 +18,18 @@ data "aws_ami" "launch_config_ami" {
   owners      = ["amazon"]
 
   filter {
-    name      = "name"
-    values    = ["amzn2-ami-hvm-*-gp2"]
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-gp2"]
   }
 
   filter {
-    name      = "root-device-type"
-    values    = ["ebs"]
+    name   = "root-device-type"
+    values = ["ebs"]
   }
 
   filter {
-    name      = "virtualization-type"
-    values    = ["hvm"]
+    name   = "virtualization-type"
+    values = ["hvm"]
   }
 }
 
@@ -43,7 +43,7 @@ data "terraform_remote_state" "net_config" {
 }
 
 resource "aws_security_group" "tf_public_sec_grp" {
-  vpc_id      = "${data.terraform_remote_state.net_config.outputs.vpc_id}"
+  vpc_id      = data.terraform_remote_state.net_config.outputs.vpc_id
   description = "tf_public_sec_grp"
 
   ingress {
@@ -72,7 +72,7 @@ resource "aws_security_group" "tf_public_sec_grp" {
 
 resource "aws_security_group" "elb_security_group" {
   description = "ELB Security Group"
-  vpc_id      = "${data.terraform_remote_state.net_config.outputs.vpc_id}"
+  vpc_id      = data.terraform_remote_state.net_config.outputs.vpc_id
 
   ingress {
     from_port   = 0
@@ -100,7 +100,7 @@ resource "aws_launch_configuration" "ec2_public_launch_configuration" {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
-  user_data                   = data.template_file.myuserdata.template
+  user_data = data.template_file.myuserdata.template
 }
 
 resource "aws_elb" "webapp_load_balancer" {
