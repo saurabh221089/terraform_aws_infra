@@ -10,18 +10,28 @@ terraform {
 }
 
 data "template_file" "myuserdata" {
-  template = file("userdata.tpl")
+  template = file("userdata-v2.tpl")
 }
 
-/* data "aws_ami" "launch_config_ami" {
+data "aws_ami" "launch_config_ami" {
   most_recent = true
-  owners      = "amazon"
+  owners      = ["amazon"]
 
   filter {
-    name      = "owner-alias"
-    values    = ["amazon"]
+    name      = "name"
+    values    = ["amzn2-ami-hvm-*-gp2"]
   }
-} */
+
+  filter {
+    name      = "root-device-type"
+    values    = ["ebs"]
+  }
+
+  filter {
+    name      = "virtualization-type"
+    values    = ["hvm"]
+  }
+}
 
 data "terraform_remote_state" "net_config" {
   backend = "s3"
@@ -81,7 +91,7 @@ resource "aws_security_group" "elb_security_group" {
 }
 
 resource "aws_launch_configuration" "ec2_public_launch_configuration" {
-  image_id                    = "ami-040c7ad0a93be494e"
+  image_id                    = data.aws_ami.launch_config_ami.id
   instance_type               = var.instance_type
   key_name                    = var.keypair
   associate_public_ip_address = true
@@ -130,6 +140,9 @@ resource "aws_autoscaling_group" "ec2_public_autoscaling_group" {
   launch_configuration = aws_launch_configuration.ec2_public_launch_configuration.name
   health_check_type    = "ELB"
   load_balancers       = [aws_elb.webapp_load_balancer.name]
+  force_delete         = true
+  default_cooldown     = 10
+  termination_policies = ["default"]
 
   tag {
     key                 = "Name"
@@ -158,7 +171,7 @@ resource "aws_autoscaling_policy" "webapp_scaling_policy" {
   }
 }
 
-resource "aws_sns_topic" "webapp_autoscaling_alert_topic" {
+/* resource "aws_sns_topic" "webapp_autoscaling_alert_topic" {
   display_name = "WebApp-AutoScaling-Topic"
   name         = "WebApp-AutoScaling-Topic"
 }
@@ -179,7 +192,7 @@ resource "aws_autoscaling_notification" "webapp_autoscaling_notification" {
   topic_arn = aws_sns_topic.webapp_autoscaling_alert_topic.arn
 }
 
-/* resource "aws_instance" "tf-ec2" {
+resource "aws_instance" "tf-ec2" {
   ami                         = "${data.aws_ami.launch_config_ami.id}"
   instance_type               = "${var.instance_type}"
   key_name		                = "${var.keypair}"
