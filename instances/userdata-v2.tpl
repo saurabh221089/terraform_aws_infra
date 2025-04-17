@@ -1,6 +1,6 @@
 #!/bin/bash
 yum update -y
-yum install httpd curl -y
+yum install httpd -y
 service httpd start
 chkconfig httpd on
 TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
